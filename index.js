@@ -20,24 +20,22 @@ const ffmpeg_args = [
     ` -c:a copy ${output}`
 ];
 
+const where = (
+    process.platform !== "win32"
+    ? "whereis"
+    : "where"
+);
 
 const ffmpeg_exists = pq.sequence([
-    cp.spawn({command: "where", arg: "ffmpeg"}),
+    cp.spawn({command: where, args: ["ffmpeg"]}),
     pq.if_else(
-        (v) => v.startsWith("INFO"),
+        (v) => v.startsWith("INFO") || v.endsWith(":"),
         pq.constant(false),
         pq.constant(true)
     )
 ]);
 
 
-
-// check if it's Windows
-
-if (process.platform !== "win32") {
-    console.error("Piattaforma non supportata");
-    process.exit(1);
-}
 
 pq.sequence([
 
