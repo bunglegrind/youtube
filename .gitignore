@@ -3,3 +3,7 @@ tests/pages/
 .DS_Store
 *~
 *.orig
+*.mp4
+*.webm
+*.og*
+.idea
