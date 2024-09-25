@@ -14,10 +14,11 @@ const audio = "audio.webm";
 const url = process.argv[2];
 const output = process.argv[3] ?? "output.webm";
 const ffmpeg_args = [
-    ` -i ${video}`,
-    ` -i ${audio}`,
-    ` -c:v copy`,
-    ` -c:a copy ${output}`
+    `-i ${video}`,
+    `-i ${audio}`,
+    "-y",
+    `-c:v copy`,
+    `-c:a copy ${output}`
 ];
 
 const where = (
