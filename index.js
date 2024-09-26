@@ -5,14 +5,15 @@ import fs from "./lib/fs-lib.js";
 import pq from "./lib/parseq-extended.js";
 import cp from "./lib/child-process.js";
 import yt from "./lib/youtube-lib.js";
+import ffmpeg from "./lib/ffmpeg-lib.js";
 
-const video = "video.mp4";
-const audio = "audio.webm";
+const video = "video.tmp";
+const audio = "audio.tmp";
 
 // input parsing
 
 const url = process.argv[2];
-const output = process.argv[3] ?? "output.webm";
+const output = process.argv[3] ?? "output.mkv";
 const ffmpeg_args = [
     `-i ${video}`,
     `-i ${audio}`,
@@ -52,7 +53,7 @@ pq.sequence([
             pq.parallel_object({
                 audio: yt.download_audio({url, output: audio}),
                 video: yt.download_video({url, output: video})
-            }),
+            },{}, 0, undefined, 1),
 
 // ffmpeg merge
 
