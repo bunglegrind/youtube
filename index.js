@@ -14,13 +14,6 @@ const audio = "audio.tmp";
 
 const url = process.argv[2];
 const output = process.argv[3] ?? "output.mkv";
-const ffmpeg_args = [
-    `-i ${video}`,
-    `-i ${audio}`,
-    "-y",
-    `-c:v copy`,
-    `-c:a copy ${output}`
-];
 
 const where = (
     process.platform !== "win32"
@@ -50,14 +43,14 @@ pq.sequence([
     pq.if_else(
         (v) => v,
         pq.sequence([
-            pq.parallel_object({
-                audio: yt.download_audio({url, output: audio}),
-                video: yt.download_video({url, output: video})
-            },{}, 0, undefined, 1),
+            pq.parallel([
+                yt.download_audio({url, output: audio}),
+                yt.download_video({url, output: video})
+            ],[], 0, undefined, 1),
 
 // ffmpeg merge
 
-            cp.spawn({command: "ffmpeg", args: ffmpeg_args}),
+            ffmpeg.merge({audio, video, output}),
 
 // delete temporary files
 
