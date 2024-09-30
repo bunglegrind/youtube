@@ -6,4 +6,6 @@ tests/pages/
 *.mp4
 *.webm
 *.og*
+*.tmo
+*.mkv
 .idea
