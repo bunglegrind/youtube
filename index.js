@@ -31,7 +31,7 @@ const ffmpeg_exists = pq.sequence([
 ]);
 
 function remove_invalid_chars(str) {
-    return str.replace(/[\s?\\\/:|<">*]/g, "");
+    return str.replace(/[\s?\\\/:|<">*]/g, "-");
 }
 
 pq.sequence([
