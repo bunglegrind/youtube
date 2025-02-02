@@ -13,7 +13,7 @@ const audio = "audio.tmp";
 // input parsing
 
 const url = process.argv[2];
-const output = process.argv[3] ?? "output.mkv";
+let output = process.argv[3] ?? "output.mkv";
 
 const where = (
     process.platform !== "win32"
@@ -30,9 +30,17 @@ const ffmpeg_exists = pq.sequence([
     )
 ]);
 
-
+function remove_invalid_chars(str) {
+    return str.replace(/[\s?\\\/:|<">*]/g, "");
+}
 
 pq.sequence([
+    yt.get_basic_info({url}),
+    pq.requestorize(function (info) {
+        output = remove_invalid_chars(info.videoDetails.title) + ".mkv";
+
+        return output;
+    }),
 
 // assure ffmpeg exists
 
@@ -50,7 +58,7 @@ pq.sequence([
 
 // ffmpeg merge
 
-            ffmpeg.merge({audio, video, output}),
+            ffmpeg.merge(() => ({audio, video, output})),
 
 // delete temporary files
 
