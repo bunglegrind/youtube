@@ -10,10 +10,13 @@ import ffmpeg from "./lib/ffmpeg-lib.js";
 const video = "video.tmp";
 const audio = "audio.tmp";
 
+const API_KEY = "";
+
+let output;
+
 // input parsing
 
 const url = process.argv[2];
-let output = process.argv[3] ?? "output.mkv";
 
 const where = (
     process.platform !== "win32"
@@ -34,8 +37,26 @@ function remove_invalid_chars(str) {
     return str.replace(/[\s?\\\/:|<">*]/g, "-");
 }
 
-pq.sequence([
-    yt.get_basic_info({url}),
+function is_playlist(url) {
+    return url.includes("list");
+}
+
+function get_playlistId(url) {
+    return url.match(/list=([^&]+)/)[1];
+}
+function save_playlist(url) {
+    return pq.sequence([
+        yt.get_playlist_videos({API_KEY, playlistId: get_playlistId(url)}),
+        pq.apply_parallel()
+    ])
+}
+
+const save_video = pq.sequence([
+    (
+        is_playlist(url)
+        ? save_playlist
+        : yt.get_basic_info({url})
+    ),
     pq.requestorize(function (info) {
         output = remove_invalid_chars(info.videoDetails.title) + ".mkv";
 
@@ -54,7 +75,7 @@ pq.sequence([
             pq.parallel([
                 yt.download_audio({url, output: audio}),
                 yt.download_video({url, output: video})
-            ],[], 0, undefined, 1),
+            ], {throttle: 1}),
 
 // ffmpeg merge
 
@@ -66,7 +87,10 @@ pq.sequence([
         ]),
         yt.download_audiovideo({url, output})
     )
-])(function (value, reason) {
+]);
+
+
+save_video(function (value, reason) {
     if (value === undefined) {
         console.error("ERROR ");
         console.error(reason);

@@ -9,7 +9,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@distube/ytdl-core": "^4.16.0"
+    "@distube/ytdl-core": "^4.16.10"
   },
   "type": "module"
 }
